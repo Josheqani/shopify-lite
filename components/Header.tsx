@@ -1,0 +1,35 @@
+import { ShoppingBag, ShoppingCart } from "lucide-react";
+import Link from "next/link";
+
+import { getCartCount } from "@/lib/cart";
+import { Badge } from "@/components/ui/badge";
+
+export async function Header() {
+  const count = await getCartCount();
+
+  return (
+    <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-lg font-semibold tracking-tight"
+        >
+          <ShoppingBag className="size-5" />
+          فروشگاه لایت
+        </Link>
+        <Link
+          href="/cart"
+          className="relative inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
+        >
+          <ShoppingCart className="size-5" />
+          <span className="hidden sm:inline">سبد خرید</span>
+          {count > 0 ? (
+            <Badge className="absolute -top-1 -right-1 size-5 justify-center rounded-full p-0 tabular-nums">
+              {count}
+            </Badge>
+          ) : null}
+        </Link>
+      </div>
+    </header>
+  );
+}
