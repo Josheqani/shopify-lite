@@ -1,3 +1,5 @@
+import { SignInButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { ShoppingBag } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -16,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CartPage() {
-  const lines = await getCartLines();
+  const [lines, { userId }] = await Promise.all([getCartLines(), auth()]);
   const totalCents = lines.reduce((sum, line) => sum + line.lineTotalCents, 0);
   const itemCount = lines.reduce((sum, line) => sum + line.quantity, 0);
 
@@ -71,7 +73,26 @@ export default async function CartPage() {
                 <span>مجموع</span>
                 <span className="tabular-nums">{formatPrice(totalCents)}</span>
               </div>
-              <CheckoutForm />
+              {userId ? (
+                <CheckoutForm />
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm text-muted-foreground">
+                    برای تکمیل خرید ابتدا وارد شوید یا ثبت‌نام کنید.
+                  </p>
+                  <SignInButton mode="modal">
+                    <button
+                      type="button"
+                      className={buttonVariants({
+                        size: "lg",
+                        className: "w-full",
+                      })}
+                    >
+                      ورود / ثبت‌نام
+                    </button>
+                  </SignInButton>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

@@ -1,9 +1,12 @@
+import { faIR } from "@clerk/localizations";
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 
 import { Header } from "@/components/Header";
 import { PageTransition } from "@/components/motion/PageTransition";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -49,22 +52,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="fa"
-      dir="rtl"
-      className={`${geistSans.variable} ${geistMono.variable} ${persianFont.variable} h-full antialiased`}
-    >
-      <body className={`${persianFont.variable} flex min-h-full flex-col`}>
-        <Header />
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-          <PageTransition>{children}</PageTransition>
-        </main>
-        <footer className="border-t">
-          <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-muted-foreground">
-            فروشگاه لایت — یه فروشگاه سریع و بی دغدغه.
-          </div>
-        </footer>
-      </body>
-    </html>
+    <ClerkProvider localization={faIR}>
+      <html
+        lang="fa"
+        dir="rtl"
+        className={`${geistSans.variable} ${geistMono.variable} ${persianFont.variable} h-full antialiased`}
+      >
+        <body className={`${persianFont.variable} flex min-h-full flex-col`}>
+          <Header />
+          <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+            <PageTransition>{children}</PageTransition>
+          </main>
+          <footer className="border-t">
+            <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-muted-foreground">
+              فروشگاه لایت — یه فروشگاه سریع و بی دغدغه.
+            </div>
+          </footer>
+          <Toaster position="top-left" richColors expand />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

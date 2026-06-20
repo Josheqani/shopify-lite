@@ -4,6 +4,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTransition } from "react";
+import { toast } from "sonner";
 
 import { removeFromCart, setQuantity } from "@/lib/actions";
 import type { CartLine } from "@/lib/cart";
@@ -15,13 +16,22 @@ export function CartItemRow({ line }: { line: CartLine }) {
 
   function changeQuantity(next: number) {
     startTransition(async () => {
-      await setQuantity(line.productId, next);
+      try {
+        await setQuantity(line.productId, next);
+      } catch {
+        toast.error("به‌روزرسانی تعداد ناموفق بود");
+      }
     });
   }
 
   function remove() {
     startTransition(async () => {
-      await removeFromCart(line.productId);
+      try {
+        await removeFromCart(line.productId);
+        toast.success("از سبد خرید حذف شد");
+      } catch {
+        toast.error("حذف کالا ناموفق بود");
+      }
     });
   }
 

@@ -1,9 +1,9 @@
 "use server";
 
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 import { CART_COOKIE, getCartLines } from "./cart";
 import { db } from "./db";
@@ -70,17 +70,36 @@ export async function removeFromCart(productId: number) {
   await setQuantity(productId, 0);
 }
 
-export async function checkout(formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim();
+export async function checkout(): Promise<
+  { orderId: number } | { error: string }
+> {
+  // Server Actions are reachable as direct POSTs, so authorization is enforced
+  // here — not only in the cart UI. Checkout requires a signed-in user.
+  // Expected failures are returned as { error } (Persian) so the client toast
+  // can show them; thrown errors would be redacted in production.
+  const { userId } = await auth();
+  if (!userId) {
+    return { error: "برای تکمیل خرید باید وارد شوید." };
+  }
+
+  // Use the authenticated user's email instead of a manually entered one.
+  const user = await currentUser();
+  const email =
+    user?.emailAddresses.find((e) => e.id === user.primaryEmailAddressId)
+      ?.emailAddress ?? user?.emailAddresses[0]?.emailAddress;
   if (!email) {
-    throw new Error("Email is required to check out.");
+    return { error: "ایمیلی برای حساب شما یافت نشد." };
   }
 
   const cartId = (await cookies()).get(CART_COOKIE)?.value;
-  if (!cartId) redirect("/cart");
+  if (!cartId) {
+    return { error: "سبد خرید شما خالی است." };
+  }
 
   const lines = await getCartLines();
-  if (lines.length === 0) redirect("/cart");
+  if (lines.length === 0) {
+    return { error: "سبد خرید شما خالی است." };
+  }
 
   const totalCents = lines.reduce((sum, line) => sum + line.lineTotalCents, 0);
 
@@ -113,5 +132,5 @@ export async function checkout(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/cart");
-  redirect(`/orders/${order.id}`);
+  return { orderId: order.id };
 }

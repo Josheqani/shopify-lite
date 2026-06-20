@@ -1,7 +1,8 @@
 "use client";
 
-import { Check, ShoppingCart } from "lucide-react";
-import { useState, useTransition } from "react";
+import { ShoppingCart } from "lucide-react";
+import { useTransition } from "react";
+import { toast } from "sonner";
 
 import { addToCart } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
@@ -20,13 +21,14 @@ export function AddToCartButton({
   className,
 }: AddToCartButtonProps) {
   const [isPending, startTransition] = useTransition();
-  const [justAdded, setJustAdded] = useState(false);
 
   function handleClick() {
-    startTransition(async () => {
-      await addToCart(productId);
-      setJustAdded(true);
-      setTimeout(() => setJustAdded(false), 1500);
+    startTransition(() => {
+      toast.promise(addToCart(productId), {
+        loading: "در حال افزودن…",
+        success: "به سبد خرید اضافه شد",
+        error: "افزودن به سبد خرید ناموفق بود",
+      });
     });
   }
 
@@ -38,15 +40,7 @@ export function AddToCartButton({
       onClick={handleClick}
       className={className}
     >
-      {justAdded ? (
-        <>
-          <Check /> افزوده شد
-        </>
-      ) : (
-        <>
-          <ShoppingCart /> {disabled ? "ناموجود" : "افزودن به سبد"}
-        </>
-      )}
+      <ShoppingCart /> {disabled ? "ناموجود" : "افزودن به سبد"}
     </Button>
   );
 }
