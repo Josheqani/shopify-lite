@@ -1,10 +1,10 @@
 import { SignInButton, UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
-import { LogIn, ShoppingBag, ShoppingCart } from "lucide-react";
+import { LogIn, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 
 import { getCartCount } from "@/lib/cart";
-import { Badge } from "@/components/ui/badge";
+import { HeaderNav } from "@/components/HeaderNav";
 
 export async function Header() {
   const [count, { userId }] = await Promise.all([getCartCount(), auth()]);
@@ -20,38 +20,7 @@ export async function Header() {
           فروشگاه لایت
         </Link>
         <div className="flex items-center gap-1 sm:gap-2">
-          <nav className="hidden items-center gap-1 md:flex">
-            <Link
-              href="/"
-              className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
-            >
-              صفحه اصلی
-            </Link>
-            <Link
-              href="/about"
-              className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
-            >
-              درباره ما
-            </Link>
-            <Link
-              href="/contact"
-              className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
-            >
-              تماس با ما
-            </Link>
-          </nav>
-          <Link
-            href="/cart"
-            className="relative inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
-          >
-            <ShoppingCart className="size-5" />
-            <span className="hidden sm:inline">سبد خرید</span>
-            {count > 0 ? (
-              <Badge className="absolute -top-1 -right-1 size-5 justify-center rounded-full p-0 tabular-nums">
-                {count}
-              </Badge>
-            ) : null}
-          </Link>
+          <HeaderNav cartCount={count} />
 
           {userId ? (
             <UserButton />

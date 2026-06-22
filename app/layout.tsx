@@ -1,23 +1,12 @@
 import { faIR } from "@clerk/localizations";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 
 import { Header } from "@/components/Header";
 import { PageTransition } from "@/components/motion/PageTransition";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 // PeydaWeb (Persian) — self-hosted via next/font/local. woff2 only: it is
 // supported by every browser Next.js 16 targets, and next/font/local does not
@@ -56,7 +45,7 @@ export default function RootLayout({
       <html
         lang="fa"
         dir="rtl"
-        className={`${geistSans.variable} ${geistMono.variable} ${persianFont.variable} h-full antialiased`}
+        className={`${persianFont.variable} h-full antialiased`}
       >
         <body className={`${persianFont.variable} flex min-h-full flex-col`}>
           <Header />
