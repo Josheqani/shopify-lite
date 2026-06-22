@@ -20,6 +20,26 @@ export async function Header() {
           فروشگاه لایت
         </Link>
         <div className="flex items-center gap-1 sm:gap-2">
+          <nav className="hidden items-center gap-1 md:flex">
+            <Link
+              href="/"
+              className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
+            >
+              صفحه اصلی
+            </Link>
+            <Link
+              href="/about"
+              className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
+            >
+              درباره ما
+            </Link>
+            <Link
+              href="/contact"
+              className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
+            >
+              تماس با ما
+            </Link>
+          </nav>
           <Link
             href="/cart"
             className="relative inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
