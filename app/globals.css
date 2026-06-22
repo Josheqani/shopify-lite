@@ -127,4 +127,14 @@
     direction: rtl;
     text-align: right;
   }
+
+  /* Clerk OTP codes are numeric/token values and must remain LTR inside the RTL UI. */
+  .cl-otpCodeFieldInputs,
+  .cl-otpCodeFieldInput {
+    direction: ltr;
+  }
+
+  .cl-otpCodeFieldInput {
+    text-align: center;
+  }
 }
