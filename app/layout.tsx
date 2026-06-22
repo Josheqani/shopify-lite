@@ -41,7 +41,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider localization={faIR}>
+    <ClerkProvider
+      localization={faIR}
+      appearance={{
+        elements: {
+          otpCodeFieldInputs: { direction: "ltr" },
+          otpCodeFieldInput: { direction: "ltr", textAlign: "center" },
+        },
+      }}
+    >
       <html
         lang="fa"
         dir="rtl"
