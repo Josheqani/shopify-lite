@@ -13,7 +13,7 @@
         "clsx": "^2.1.1",
         "drizzle-orm": "^0.45.2",
         "framer-motion": "^12.40.0",
-        "hub-pop": "^1.0.0",
+        "hub-pop": "^1.0.1",
         "lucide-react": "^1.21.0",
         "next": "16.2.9",
         "next-themes": "^0.4.6",
@@ -810,7 +810,7 @@
 
     "https-proxy-agent": ["https-proxy-agent@7.0.6", "", { "dependencies": { "agent-base": "^7.1.2", "debug": "4" } }, "sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw=="],
 
-    "hub-pop": ["hub-pop@1.0.0", "", {}, "sha512-wIAN3yqhCTh+3YSABCB4fV7aLIb6lDbtCXKFrI2084nrLJ6j3c82QWqDJ26ec2GcZLIIor8jLAur21lKbxlhrg=="],
+    "hub-pop": ["hub-pop@1.0.1", "", {}, "sha512-95152AgQ3KRO4P0VWeCW9v026SsrZw+V/GahSQOvmVE1ulswijIj6lGYluStx2H07FTU3D5Aav8AS0r94fK8fA=="],
 
     "human-signals": ["human-signals@8.0.1", "", {}, "sha512-eKCa6bwnJhvxj14kZk5NCPc6Hb6BdsU9DZcOnmQKSnO1VKrfV0zCvtttPZUsBvjmNDn8rpcJfpwSYnHBjc95MQ=="],
 
