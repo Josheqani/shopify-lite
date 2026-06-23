@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { PageTransition } from "@/components/motion/PageTransition";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
+import { HubPopWidget } from "@/components/HubPopWidget";
 
 // PeydaWeb (Persian) — self-hosted via next/font/local. woff2 only: it is
 // supported by every browser Next.js 16 targets, and next/font/local does not
@@ -66,6 +67,7 @@ export default function RootLayout({
             </div>
           </footer>
           <Toaster position="top-left" richColors expand />
+          <HubPopWidget />
         </body>
       </html>
     </ClerkProvider>
