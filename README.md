@@ -1,36 +1,143 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Shopify Lite · فروشگاه لایت
+
+A small, fast, fully right-to-left (RTL) e-commerce storefront built on the modern Next.js App Router. It ships a complete shopping flow — browse catalog, add to cart, sign in, check out — backed by a serverless Postgres database and React Server Components throughout.
+
+The UI is in Persian (Farsi) and the layout is RTL end to end, including a self-hosted Persian web font and a localized authentication experience.
+
+---
+
+## Features
+
+- 🛍️ **Product catalog** — server-rendered listing and per-product detail pages (`/`, `/products/[slug]`).
+- 🛒 **Persistent cart** — backed by Postgres, identified by an opaque `httpOnly` cookie so it survives across visits without requiring a login.
+- 🔐 **Authentication** — email/OTP sign-in via [Clerk](https://clerk.com), localized to Persian (`faIR`) with an LTR-corrected OTP field.
+- 💳 **Checkout** — authenticated checkout that snapshots line items, records the order, decrements stock, and clears the cart.
+- 📦 **Order history** — order confirmation and detail pages (`/orders/[id]`).
+- 🌐 **Static pages** — About and Contact (with a contact form).
+- ✨ **Polished UX** — page transitions and fade-in animations via Framer Motion, toast notifications via Sonner, and a [shadcn](https://ui.shadcn.com)/Tailwind component system.
+- 🇮🇷 **First-class RTL** — `dir="rtl"`, self-hosted PeydaWeb font, and prices in Toman.
+
+## Tech Stack
+
+| Layer            | Choice                                                        |
+| ---------------- | ------------------------------------------------------------- |
+| Framework        | [Next.js 16](https://nextjs.org) (App Router, Server Actions) |
+| UI               | [React 19](https://react.dev)                                 |
+| Styling          | [Tailwind CSS v4](https://tailwindcss.com) + shadcn / Base UI |
+| Animation        | [Framer Motion](https://www.framer.com/motion/)               |
+| Database         | [Neon](https://neon.tech) serverless Postgres                 |
+| ORM              | [Drizzle ORM](https://orm.drizzle.team)                       |
+| Auth             | [Clerk](https://clerk.com)                                    |
+| Toasts           | [Sonner](https://sonner.emilkowal.ski)                        |
+| Package manager  | [Bun](https://bun.sh)                                         |
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- [Bun](https://bun.sh) (used for installs, scripts, and seeding)
+- A [Neon](https://neon.tech) (or any Postgres) database connection string
+- A [Clerk](https://clerk.com) application (publishable + secret keys)
+
+### 1. Install dependencies
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Configure environment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env.local` file in the project root:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Postgres connection string (Neon recommended)
+DATABASE_URL="postgresql://user:password@host/db?sslmode=require"
 
-## Learn More
+# Clerk keys (from your Clerk dashboard)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_test_..."
+CLERK_SECRET_KEY="sk_test_..."
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Set up the database
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Push the Drizzle schema and seed it with sample products:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+bun run db:push   # create tables from lib/schema.ts
+bun run db:seed   # insert sample products
+```
 
-## Deploy on Vercel
+### 4. Run the dev server
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+bun run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open [http://localhost:3000](http://localhost:3000).
+
+## Scripts
+
+| Command            | Description                                  |
+| ------------------ | -------------------------------------------- |
+| `bun run dev`      | Start the development server                 |
+| `bun run build`    | Build for production                         |
+| `bun run start`    | Start the production server                  |
+| `bun run lint`     | Run ESLint                                   |
+| `bun run db:push`  | Push the Drizzle schema to the database      |
+| `bun run db:seed`  | Seed the database with sample products       |
+| `bun run db:studio`| Open Drizzle Studio to inspect the database  |
+
+## Project Structure
+
+```
+app/                  App Router pages & layouts
+├── page.tsx          Storefront home (product grid)
+├── products/[slug]/  Product detail
+├── cart/             Cart page
+├── orders/[id]/      Order confirmation/detail
+├── about, contact/   Static pages
+├── layout.tsx        Root layout (RTL, fonts, Clerk, Header/Footer)
+└── loading.tsx       Route-level loading UI
+
+components/           UI components (Header, ProductCard, forms, motion, shadcn/ui)
+lib/
+├── schema.ts         Drizzle table definitions
+├── db.ts             Neon + Drizzle client
+├── cart.ts           Cart read helpers (cookie-based)
+├── actions.ts        Server Actions (addToCart, checkout, …)
+└── format.ts, utils.ts
+
+scripts/seed.ts       Sample-data seeder
+proxy.ts              Clerk middleware (Next.js 16 "proxy")
+drizzle.config.ts     Drizzle Kit config
+```
+
+## Data Model
+
+Four tables defined in `lib/schema.ts`:
+
+- **products** — catalog items (name, slug, description, price, image, stock).
+- **cart_items** — one row per `(cartId, productId)`; quantity increments on repeat adds. The `cartId` comes from an `httpOnly` cookie.
+- **orders** — a completed purchase (cart id, email, total, status).
+- **order_items** — line items that snapshot name and price at purchase time, so later catalog edits never rewrite order history.
+
+> **Note on money:** prices are stored as integer **Toman** (no subunit) in the existing `*_cents` columns to avoid a migration.
+
+## Architecture Notes
+
+- **Server Actions everywhere.** Cart mutations and checkout (`lib/actions.ts`) run on the server. Authorization is enforced inside the action — `checkout()` requires a signed-in user — because Server Actions are reachable as direct POSTs.
+- **Cookie-scoped carts.** A guest can fill a cart before authenticating; the cart is keyed by an opaque UUID cookie rather than a user id.
+- **Neon HTTP driver.** Uses `neon-http`, which has no interactive transactions, so checkout writes run sequentially.
+- **Next.js 16 conventions.** Middleware lives in `proxy.ts` (renamed from `middleware.ts` in Next 16). Refer to `node_modules/next/dist/docs/` before relying on older Next.js APIs.
+
+## Deployment
+
+This app deploys cleanly to [Vercel](https://vercel.com). Set the same environment variables (`DATABASE_URL`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`) in your project settings, then run the production build:
+
+```bash
+bun run build && bun run start
+```
+
+## License
+
+Private project — all rights reserved.
