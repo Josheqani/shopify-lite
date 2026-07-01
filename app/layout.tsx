@@ -1,7 +1,7 @@
 import { faIR } from "@clerk/localizations";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Vazirmatn } from "next/font/google";
 
 import { Header } from "@/components/Header";
 import { PageTransition } from "@/components/motion/PageTransition";
@@ -9,21 +9,11 @@ import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import { HubPopWidget } from "@/components/HubPopWidget";
 
-// PeydaWeb (Persian) — self-hosted via next/font/local. woff2 only: it is
-// supported by every browser Next.js 16 targets, and next/font/local does not
-// accept .eot. One entry per weight; note the lowercase filenames for 200/300.
-const persianFont = localFont({
-  src: [
-    { path: "./fonts/woff2/PeydaWeb-Thin.woff2", weight: "100", style: "normal" },
-    { path: "./fonts/woff2/peydaWeb-extralight.woff2", weight: "200", style: "normal" },
-    { path: "./fonts/woff2/peydaWeb-light.woff2", weight: "300", style: "normal" },
-    { path: "./fonts/woff2/PeydaWeb-Regular.woff2", weight: "400", style: "normal" },
-    { path: "./fonts/woff2/PeydaWeb-Medium.woff2", weight: "500", style: "normal" },
-    { path: "./fonts/woff2/PeydaWeb-SemiBold.woff2", weight: "600", style: "normal" },
-    { path: "./fonts/woff2/PeydaWeb-Bold.woff2", weight: "700", style: "normal" },
-    { path: "./fonts/woff2/PeydaWeb-ExtraBold.woff2", weight: "800", style: "normal" },
-    { path: "./fonts/woff2/PeydaWeb-Black.woff2", weight: "900", style: "normal" },
-  ],
+// Vazirmatn (Persian) from Google Fonts via next/font/google. Next.js
+// downloads it at build time and self-hosts it with the app.
+const persianFont = Vazirmatn({
+  subsets: ["arabic"],
+  weight: "variable",
   variable: "--font-persian",
   display: "swap",
 });
