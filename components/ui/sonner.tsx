@@ -34,7 +34,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           "--normal-text": "var(--popover-foreground)",
           "--normal-border": "var(--border)",
           "--border-radius": "var(--radius)",
-          // Use the app's Persian font (PeydaWeb); toasts inherit it.
+          // Use the app's Persian font (Vazirmatn); toasts inherit it.
           fontFamily: "var(--font-persian), sans-serif",
         } as React.CSSProperties
       }

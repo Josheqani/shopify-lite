@@ -2,7 +2,7 @@
 
 A small, fast, fully right-to-left (RTL) e-commerce storefront built on the modern Next.js App Router. It ships a complete shopping flow — browse catalog, add to cart, sign in, check out — backed by a serverless Postgres database and React Server Components throughout.
 
-The UI is in Persian (Farsi) and the layout is RTL end to end, including a self-hosted Persian web font and a localized authentication experience.
+The UI is in Persian (Farsi) and the layout is RTL end to end, including a Google Fonts-powered Persian web font self-hosted by Next.js and a localized authentication experience.
 
 ---
 
@@ -15,7 +15,7 @@ The UI is in Persian (Farsi) and the layout is RTL end to end, including a self-
 - 📦 **Order history** — order confirmation and detail pages (`/orders/[id]`).
 - 🌐 **Static pages** — About and Contact (with a contact form).
 - ✨ **Polished UX** — page transitions and fade-in animations via Framer Motion, toast notifications via Sonner, and a [shadcn](https://ui.shadcn.com)/Tailwind component system.
-- 🇮🇷 **First-class RTL** — `dir="rtl"`, self-hosted PeydaWeb font, and prices in Toman.
+- 🇮🇷 **First-class RTL** — `dir="rtl"`, Vazirmatn font via `next/font/google`, and prices in Toman.
 
 ## Tech Stack
 
