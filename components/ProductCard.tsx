@@ -28,7 +28,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
     >
       <Card className="h-full overflow-hidden pt-0 transition-shadow duration-300 hover:shadow-lg">
         <Link href={`/products/${product.slug}`} className="block">
-          <div className="relative aspect-square overflow-hidden bg-muted">
+          <div className="relative aspect-square overflow-hidden bg-muted border-b">
             {product.imageUrl ? (
               <Image
                 src={product.imageUrl}
