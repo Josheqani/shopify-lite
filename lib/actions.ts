@@ -95,3 +95,25 @@ export async function checkout(): Promise<
     return { error: "خطا در ثبت سفارش" };
   }
 }
+
+export async function submitContactMessage(formData: FormData) {
+  const name = formData.get("name") as string;
+  const email = formData.get("email") as string;
+  const phone = formData.get("phone") as string || null;
+  const subject = formData.get("subject") as string;
+  const message = formData.get("message") as string;
+
+  try {
+    await api.post("/messages", {
+      name,
+      email,
+      phone,
+      subject,
+      message,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to submit contact message", error);
+    return { error: "خطا در ارسال پیام. لطفاً دوباره تلاش کنید." };
+  }
+}
