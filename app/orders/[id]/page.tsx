@@ -1,12 +1,11 @@
-import { eq } from "drizzle-orm";
 import { CheckCircle2 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { db } from "@/lib/db";
+import { api } from "@/lib/api";
 import { formatPrice } from "@/lib/format";
-import { orderItems, orders } from "@/lib/schema";
+import type { OrderItem } from "@/lib/types";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,17 +24,15 @@ export default async function OrderPage({ params }: OrderPageProps) {
   const orderId = Number(id);
   if (!Number.isInteger(orderId)) notFound();
 
-  const [order] = await db
-    .select()
-    .from(orders)
-    .where(eq(orders.id, orderId))
-    .limit(1);
-  if (!order) notFound();
+  let order;
+  try {
+    const { data: res } = await api.get(`/orders/${orderId}`);
+    order = res.data;
+  } catch {
+    notFound();
+  }
 
-  const items = await db
-    .select()
-    .from(orderItems)
-    .where(eq(orderItems.orderId, orderId));
+  const items: OrderItem[] = order.items || [];
 
   return (
     <FadeIn>

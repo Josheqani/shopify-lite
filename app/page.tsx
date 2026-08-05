@@ -1,15 +1,11 @@
-import { asc } from "drizzle-orm";
-
-import { db } from "@/lib/db";
-import { products } from "@/lib/schema";
+import { api } from "@/lib/api";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { ProductCard } from "@/components/ProductCard";
+import type { Product } from "@/lib/types";
 
 export default async function Home() {
-  const allProducts = await db
-    .select()
-    .from(products)
-    .orderBy(asc(products.id));
+  const { data: res } = await api.get("/products");
+  const allProducts: Product[] = res.data;
 
   return (
     <div className="flex flex-col gap-8">

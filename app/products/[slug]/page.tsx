@@ -1,13 +1,11 @@
-import { eq } from "drizzle-orm";
 import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { db } from "@/lib/db";
+import { api } from "@/lib/api";
 import { formatPrice } from "@/lib/format";
-import { products } from "@/lib/schema";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { Badge } from "@/components/ui/badge";
@@ -17,12 +15,12 @@ type ProductPageProps = {
 };
 
 async function getProduct(slug: string) {
-  const [product] = await db
-    .select()
-    .from(products)
-    .where(eq(products.slug, slug))
-    .limit(1);
-  return product;
+  try {
+    const { data: res } = await api.get(`/products/${slug}`);
+    return res.data;
+  } catch {
+    return null;
+  }
 }
 
 export async function generateMetadata({

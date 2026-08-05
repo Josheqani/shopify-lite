@@ -1,10 +1,7 @@
 import "server-only";
 
-import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
-
-import { db } from "./db";
-import { cartItems, products } from "./schema";
+import { api } from "./api";
 
 export const CART_COOKIE = "cartId";
 
@@ -30,25 +27,12 @@ export async function getCartLines(): Promise<CartLine[]> {
   const cartId = await getCartId();
   if (!cartId) return [];
 
-  const rows = await db
-    .select({
-      productId: products.id,
-      name: products.name,
-      slug: products.slug,
-      imageUrl: products.imageUrl,
-      priceCents: products.priceCents,
-      stock: products.stock,
-      quantity: cartItems.quantity,
-    })
-    .from(cartItems)
-    .innerJoin(products, eq(cartItems.productId, products.id))
-    .where(eq(cartItems.cartId, cartId))
-    .orderBy(cartItems.createdAt);
-
-  return rows.map((row) => ({
-    ...row,
-    lineTotalCents: row.priceCents * row.quantity,
-  }));
+  try {
+    const { data: res } = await api.get(`/cart/${cartId}`);
+    return res.data.lines;
+  } catch {
+    return [];
+  }
 }
 
 /** Total item count across the cart, for the header badge. */

@@ -8,6 +8,7 @@ import { PageTransition } from "@/components/motion/PageTransition";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import { HubPopWidget } from "@/components/HubPopWidget";
+import Providers from "@/components/Providers";
 
 // Vazirmatn (Persian) from Google Fonts via next/font/google. Next.js
 // downloads it at build time and self-hosts it with the app.
@@ -47,17 +48,19 @@ export default function RootLayout({
         className={`${persianFont.variable} h-full antialiased`}
       >
         <body className={`${persianFont.variable} flex min-h-full flex-col`}>
-          <Header />
-          <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-            <PageTransition>{children}</PageTransition>
-          </main>
-          <footer className="border-t">
-            <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-muted-foreground">
-              فروشگاه لایت — یه فروشگاه سریع و بی دغدغه.
-            </div>
-          </footer>
-          <Toaster position="top-left" richColors expand />
-          <HubPopWidget />
+          <Providers>
+            <Header />
+            <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+              <PageTransition>{children}</PageTransition>
+            </main>
+            <footer className="border-t">
+              <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-muted-foreground">
+                فروشگاه لایت — یه فروشگاه سریع و بی دغدغه.
+              </div>
+            </footer>
+            <Toaster position="top-left" richColors expand />
+            <HubPopWidget />
+          </Providers>
         </body>
       </html>
     </ClerkProvider>

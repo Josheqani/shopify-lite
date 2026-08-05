@@ -1,13 +1,11 @@
 "use server";
 
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 import { CART_COOKIE, getCartLines } from "./cart";
-import { db } from "./db";
-import { cartItems, orderItems, orders, products } from "./schema";
+import { api, getAuthApi } from "./api";
 
 const CART_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
@@ -30,13 +28,7 @@ async function getOrCreateCartId(): Promise<string> {
 export async function addToCart(productId: number) {
   const cartId = await getOrCreateCartId();
 
-  await db
-    .insert(cartItems)
-    .values({ cartId, productId, quantity: 1 })
-    .onConflictDoUpdate({
-      target: [cartItems.cartId, cartItems.productId],
-      set: { quantity: sql`${cartItems.quantity} + 1` },
-    });
+  await api.post(`/cart/${cartId}/items`, { productId });
 
   revalidatePath("/");
   revalidatePath("/cart");
@@ -48,18 +40,9 @@ export async function setQuantity(productId: number, quantity: number) {
   if (!cartId) return;
 
   if (quantity <= 0) {
-    await db
-      .delete(cartItems)
-      .where(
-        and(eq(cartItems.cartId, cartId), eq(cartItems.productId, productId)),
-      );
+    await api.delete(`/cart/${cartId}/items/${productId}`);
   } else {
-    await db
-      .update(cartItems)
-      .set({ quantity })
-      .where(
-        and(eq(cartItems.cartId, cartId), eq(cartItems.productId, productId)),
-      );
+    await api.patch(`/cart/${cartId}/items/${productId}`, { quantity });
   }
 
   revalidatePath("/cart");
@@ -73,64 +56,42 @@ export async function removeFromCart(productId: number) {
 export async function checkout(): Promise<
   { orderId: number } | { error: string }
 > {
-  // Server Actions are reachable as direct POSTs, so authorization is enforced
-  // here — not only in the cart UI. Checkout requires a signed-in user.
-  // Expected failures are returned as { error } (Persian) so the client toast
-  // can show them; thrown errors would be redacted in production.
   const { userId } = await auth();
+  console.log("Checkout: userId =", userId);
   if (!userId) {
     return { error: "برای تکمیل خرید باید وارد شوید." };
   }
 
-  // Use the authenticated user's email instead of a manually entered one.
   const user = await currentUser();
   const email =
     user?.emailAddresses.find((e) => e.id === user.primaryEmailAddressId)
       ?.emailAddress ?? user?.emailAddresses[0]?.emailAddress;
+  console.log("Checkout: email =", email);
   if (!email) {
     return { error: "ایمیلی برای حساب شما یافت نشد." };
   }
 
   const cartId = (await cookies()).get(CART_COOKIE)?.value;
+  console.log("Checkout: cartId =", cartId);
   if (!cartId) {
     return { error: "سبد خرید شما خالی است." };
   }
 
   const lines = await getCartLines();
+  console.log("Checkout: lines count =", lines.length);
   if (lines.length === 0) {
     return { error: "سبد خرید شما خالی است." };
   }
 
-  const totalCents = lines.reduce((sum, line) => sum + line.lineTotalCents, 0);
+  try {
+    const authApi = await getAuthApi();
+    const { data: res } = await authApi.post("/checkout", { cartId });
 
-  // neon-http has no interactive transactions, so run the writes sequentially.
-  const [order] = await db
-    .insert(orders)
-    .values({ cartId, email, totalCents, status: "paid" })
-    .returning({ id: orders.id });
-
-  await db.insert(orderItems).values(
-    lines.map((line) => ({
-      orderId: order.id,
-      productId: line.productId,
-      name: line.name,
-      priceCents: line.priceCents,
-      quantity: line.quantity,
-    })),
-  );
-
-  // Decrement stock for each purchased product.
-  for (const line of lines) {
-    await db
-      .update(products)
-      .set({ stock: sql`greatest(${products.stock} - ${line.quantity}, 0)` })
-      .where(eq(products.id, line.productId));
+    revalidatePath("/");
+    revalidatePath("/cart");
+    return { orderId: res.data.orderId };
+  } catch (error: any) {
+    console.error("Checkout failed:", error?.response?.status, error?.response?.data || error?.message);
+    return { error: "خطا در ثبت سفارش" };
   }
-
-  // Empty the cart.
-  await db.delete(cartItems).where(eq(cartItems.cartId, cartId));
-
-  revalidatePath("/");
-  revalidatePath("/cart");
-  return { orderId: order.id };
 }
