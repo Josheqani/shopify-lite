@@ -48,7 +48,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         <CardContent className="flex flex-col gap-1">
           <Link
             href={`/products/${product.slug}`}
-            className="font-medium leading-tight hover:underline"
+            className="line-clamp-2 font-medium leading-tight hover:underline"
           >
             {product.name}
           </Link>
